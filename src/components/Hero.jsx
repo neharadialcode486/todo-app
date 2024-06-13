@@ -20,6 +20,9 @@ const Hero = () => {
       fees: null,
     },
   });
+
+  // FETCH FUNCTION ==================================================
+
   const fetchData = async (id) => {
     try {
       let { data } = await supabase.from("demo").select("*");
@@ -35,13 +38,16 @@ const Hero = () => {
     fetchData();
   }, []);
 
+  // SUBMIT FUNCTION ==================================================
+
   const onSubmit = async (value) => {
     try {
       let { data } = await supabase.from("demo").insert({
-        Name: value.name,
-        Email: value.email,
-        Course: value.course,
-        Fees: value.fees,
+        name: value.name,
+        email: value.email,
+        course: value.course,
+        fees: value.fees,
+        id: tableList.length + 1,
       });
       console.log(data, "data");
       reset();
@@ -49,6 +55,13 @@ const Hero = () => {
     } catch (error) {
       console.log(error, "error");
     }
+  };
+
+  // DELETE FUNCTION ==================================================
+  const deleteHandler = async (index) => {
+    const response = await supabase.from("demo").delete().eq("id", index);
+    fetchData();
+    console.log(response, "response");
   };
 
   return (
@@ -95,7 +108,9 @@ const Hero = () => {
           </button>
         </div>
       </form>
-      {tableList && <Table tableList={tableList} />}
+      {tableList.length > 0 && (
+        <Table tableList={tableList} deleteHandler={deleteHandler} />
+      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React from "react";
 
-const Table = ({ tableList }) => {
+const Table = ({ tableList, deleteHandler }) => {
   return (
     <table className="w-full mt-10 ">
       <tbody>
@@ -14,18 +14,21 @@ const Table = ({ tableList }) => {
         </tr>
         {tableList &&
           tableList.map((obj, i) => (
-            <tr>
-              <td className="border py-2 px-3"> {obj.Name}</td>
-              <td className="border py-2 px-3">{obj.Email}</td>
-              <td className="border py-2 px-3">{obj.Course}</td>
-              <td className="border py-2 px-3">{obj.Fees}</td>
+            <tr key={i}>
+              <td className="border py-2 px-3"> {obj.name}</td>
+              <td className="border py-2 px-3">{obj.email}</td>
+              <td className="border py-2 px-3">{obj.course}</td>
+              <td className="border py-2 px-3">{obj.fees}</td>
               <td className="border py-2 px-3">
                 <button className="bg-yellow-600 px-6 py-2  hover:bg-opacity-90 transition-all duration-200 ease-in-out">
                   Update
                 </button>
               </td>
               <td className="border py-2 px-3">
-                <button className="bg-red-600 px-6 py-2 hover:bg-opacity-90 transition-all duration-200 ease-in-out ">
+                <button
+                  onClick={() => deleteHandler(obj.id)}
+                  className="bg-red-600 px-6 py-2 hover:bg-opacity-90 transition-all duration-200 ease-in-out "
+                >
                   Delete
                 </button>
               </td>
