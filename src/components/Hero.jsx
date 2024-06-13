@@ -2,6 +2,8 @@
 import supabase from "@/config/supabaseClient";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import Table from "./Table";
+import { v4 as uuidv4 } from "uuid";
 
 const Hero = () => {
   const [tableList, setTableList] = useState([]);
@@ -23,7 +25,6 @@ const Hero = () => {
       let { data } = await supabase.from("demo").select("*");
       if (data) {
         setTableList(data);
-        console.log("Data:", data);
       }
     } catch (error) {
       console.log(error, "error");
@@ -31,14 +32,22 @@ const Hero = () => {
   };
 
   React.useEffect(() => {
-    fetchData(1);
+    fetchData();
   }, []);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (value) => {
     try {
-      // reset();
+      let { data } = await supabase.from("demo").insert({
+        Name: value.name,
+        Email: value.email,
+        Course: value.course,
+        Fees: value.fees,
+      });
+      console.log(data, "data");
+      reset();
+      fetchData();
     } catch (error) {
-      // console.log(error, "error");
+      console.log(error, "error");
     }
   };
 
@@ -86,25 +95,7 @@ const Hero = () => {
           </button>
         </div>
       </form>
-      {tableList && (
-        <table className="w-full mt-10 ">
-          <tr>
-            <th className="border text-start px-3 py-2">Name</th>
-            <th className="border text-start px-3 py-2">Email</th>
-            <th className="border text-start px-3 py-2">Course</th>
-            <th className="border text-start px-3 py-2">Fees</th>
-          </tr>
-          {tableList &&
-            tableList.map((obj, i) => (
-              <tr>
-                <td className="border py-2 px-3"> {obj.Name}</td>
-                <td className="border py-2 px-3">{obj.Email}</td>
-                <td className="border py-2 px-3">Germany</td>
-                <td className="border py-2 px-3">Germany</td>
-              </tr>
-            ))}
-        </table>
-      )}
+      {tableList && <Table tableList={tableList} />}
     </div>
   );
 };
