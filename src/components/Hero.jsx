@@ -1,4 +1,5 @@
 "use client";
+import supabase from "@/config/supabaseClient";
 import React from "react";
 import { useForm } from "react-hook-form";
 
@@ -17,13 +18,27 @@ const Hero = () => {
     },
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     try {
-      reset();
+      // reset();
+    } catch (error) {
+      // console.log(error, "error");
+    }
+  };
+  const fetchData = async (id) => {
+    try {
+      let { data } = await supabase.from("abctable").insert({});
+      if (data) {
+        console.log("Data:", data);
+      }
     } catch (error) {
       console.log(error, "error");
     }
   };
+
+  React.useEffect(() => {
+    fetchData(1); // Call fetchData with the desired ID
+  }, []);
 
   return (
     <div className="p-5">
