@@ -1,9 +1,11 @@
 import React from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
+import { useRouter } from "next/navigation";
 gsap.registerPlugin(ScrollTrigger);
 
 const Button = () => {
+  const router = useRouter();
   const text = "Get into touch";
   const arr = text.split(" ").map((obj) => obj.split(""));
 

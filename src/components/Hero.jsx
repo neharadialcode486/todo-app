@@ -1,9 +1,10 @@
 "use client";
 import supabase from "@/config/supabaseClient";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
 const Hero = () => {
+  const [tableList, setTableList] = useState([]);
   const {
     register,
     handleSubmit,
@@ -17,18 +18,11 @@ const Hero = () => {
       fees: null,
     },
   });
-
-  const onSubmit = async (data) => {
-    try {
-      // reset();
-    } catch (error) {
-      // console.log(error, "error");
-    }
-  };
   const fetchData = async (id) => {
     try {
-      let { data } = await supabase.from("abctable").insert({});
+      let { data } = await supabase.from("demo").select("*");
       if (data) {
+        setTableList(data);
         console.log("Data:", data);
       }
     } catch (error) {
@@ -37,8 +31,16 @@ const Hero = () => {
   };
 
   React.useEffect(() => {
-    fetchData(1); // Call fetchData with the desired ID
+    fetchData(1);
   }, []);
+
+  const onSubmit = async (data) => {
+    try {
+      // reset();
+    } catch (error) {
+      // console.log(error, "error");
+    }
+  };
 
   return (
     <div className="p-5">
@@ -84,6 +86,25 @@ const Hero = () => {
           </button>
         </div>
       </form>
+      {tableList && (
+        <table className="w-full mt-10 ">
+          <tr>
+            <th className="border text-start px-3 py-2">Name</th>
+            <th className="border text-start px-3 py-2">Email</th>
+            <th className="border text-start px-3 py-2">Course</th>
+            <th className="border text-start px-3 py-2">Fees</th>
+          </tr>
+          {tableList &&
+            tableList.map((obj, i) => (
+              <tr>
+                <td className="border py-2 px-3"> {obj.Name}</td>
+                <td className="border py-2 px-3">{obj.Email}</td>
+                <td className="border py-2 px-3">Germany</td>
+                <td className="border py-2 px-3">Germany</td>
+              </tr>
+            ))}
+        </table>
+      )}
     </div>
   );
 };
