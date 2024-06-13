@@ -7,10 +7,13 @@ import { v4 as uuidv4 } from "uuid";
 
 const Hero = () => {
   const [tableList, setTableList] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
+
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -47,7 +50,7 @@ const Hero = () => {
         email: value.email,
         course: value.course,
         fees: value.fees,
-        id: tableList.length + 1,
+        id: editIndex ? editIndex : tableList.length + 1,
       });
       console.log(data, "data");
       reset();
@@ -62,6 +65,28 @@ const Hero = () => {
     const response = await supabase.from("demo").delete().eq("id", index);
     fetchData();
     console.log(response, "response");
+  };
+
+  // UPDATE FUNCTION ==================================================
+  const updateHandler = async (index) => {
+    console.log("indexindex", index);
+    setEditIndex(index);
+    const item = tableList.find((item) => item.id === index);
+    if (item) {
+      setValue("name", item.name);
+      setValue("email", item.email);
+      setValue("course", item.course);
+      setValue("fees", item.fees);
+    }
+    const { data, error } = await supabase
+      .from("demo")
+      .update({
+        name: item.name,
+        email: item.email,
+        course: item.course,
+        fees: item.fees,
+      })
+      .eq("id", index);
   };
 
   return (
@@ -109,7 +134,11 @@ const Hero = () => {
         </div>
       </form>
       {tableList.length > 0 && (
-        <Table tableList={tableList} deleteHandler={deleteHandler} />
+        <Table
+          tableList={tableList}
+          deleteHandler={deleteHandler}
+          updateHandler={updateHandler}
+        />
       )}
     </div>
   );
