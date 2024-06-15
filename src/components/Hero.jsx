@@ -3,12 +3,12 @@ import supabase from "@/config/supabaseClient";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Table from "./Table";
-import { v4 as uuidv4 } from "uuid";
 
 const Hero = () => {
   const [tableList, setTableList] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
-
+  const [image, setImg] = useState("");
+  // console.log(tableList, "tableList");
   const {
     register,
     handleSubmit,
@@ -21,12 +21,13 @@ const Hero = () => {
       email: "",
       course: "",
       fees: null,
+      picture: "",
     },
   });
 
   // FETCH FUNCTION ==================================================
 
-  const fetchData = async (id) => {
+  const fetchData = async () => {
     try {
       let { data } = await supabase.from("demo").select("*");
       if (data) {
@@ -44,16 +45,42 @@ const Hero = () => {
   // SUBMIT FUNCTION ==================================================
 
   const onSubmit = async (value) => {
+    setImg(value.picture[0].name);
     try {
-      let { data } = await supabase.from("demo").insert({
-        name: value.name,
-        email: value.email,
-        course: value.course,
-        fees: value.fees,
-        id: editIndex ? editIndex : tableList.length + 1,
-      });
-      console.log(data, "data");
-      reset();
+      const { error } = await supabase.storage
+        .from("images")
+        .upload(`/public/${value.picture[0].name}`, value.picture[0], {
+          cacheControl: "3600",
+          upsert: false,
+        });
+      const { data } = supabase.storage
+        .from("images")
+        .getPublicUrl(`public/${image}`);
+
+      if (editIndex !== null && data.publicUrl) {
+        await supabase
+          .from("demo")
+          .update({
+            name: value.name,
+            email: value.email,
+            course: value.course,
+            fees: value.fees,
+            picture: data.publicUrl,
+          })
+          .eq("id", editIndex);
+        setEditIndex(null);
+      } else {
+        if (data.publicUrl) {
+          await supabase.from("demo").insert({
+            name: value.name,
+            email: value.email,
+            course: value.course,
+            fees: value.fees,
+            picture: data.publicUrl,
+          });
+        }
+      }
+      // reset();
       fetchData();
     } catch (error) {
       console.log(error, "error");
@@ -68,25 +95,15 @@ const Hero = () => {
   };
 
   // UPDATE FUNCTION ==================================================
-  const updateHandler = async (index) => {
-    console.log("indexindex", index);
-    setEditIndex(index);
-    const item = tableList.find((item) => item.id === index);
+  const updateHandler = async (id) => {
+    const item = tableList.find((item) => item.id === id);
     if (item) {
       setValue("name", item.name);
       setValue("email", item.email);
       setValue("course", item.course);
       setValue("fees", item.fees);
+      setEditIndex(id);
     }
-    const { data, error } = await supabase
-      .from("demo")
-      .update({
-        name: item.name,
-        email: item.email,
-        course: item.course,
-        fees: item.fees,
-      })
-      .eq("id", index);
   };
 
   return (
@@ -123,7 +140,12 @@ const Hero = () => {
           className="border-blue-400 bg-transparent border w-full my-5inline-block p-5 mt-4 mb-2"
           {...register("fees", { required: true })}
         />
-        {errors.fees && <span>This field is required</span>}
+        <input
+          type="file"
+          {...register("picture", { required: true })}
+          className="border-blue-400 bg-transparent border w-full my-5inline-block p-5 mt-4 mb-2"
+        />
+        {errors.picture && <span>Picture not found</span>}
         <div className="text-center">
           <button
             type="submit"

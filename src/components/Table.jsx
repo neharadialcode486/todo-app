@@ -5,6 +5,7 @@ const Table = ({ tableList, deleteHandler, updateHandler }) => {
     <table className="w-full mt-10 ">
       <tbody>
         <tr>
+          <th className="border text-start px-3 py-2">Profile</th>
           <th className="border text-start px-3 py-2">Name</th>
           <th className="border text-start px-3 py-2">Email</th>
           <th className="border text-start px-3 py-2">Course</th>
@@ -16,6 +17,17 @@ const Table = ({ tableList, deleteHandler, updateHandler }) => {
         {tableList &&
           tableList.map((obj, i) => (
             <tr key={i}>
+              <td className="border py-2 px-3">
+                {obj.picture && (
+                  <img
+                    className="object-cover overflow-hidden h-[40px] w-[40px]"
+                    height={40}
+                    width={40}
+                    src={obj.picture}
+                    alt="profile"
+                  />
+                )}
+              </td>
               <td className="border py-2 px-3"> {obj.name}</td>
               <td className="border py-2 px-3">{obj.email}</td>
               <td className="border py-2 px-3">{obj.course}</td>
